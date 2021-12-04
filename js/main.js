@@ -41,7 +41,8 @@ const SEARCH = {
   
   handleSearch: (ev) => {
     ev.preventDefault();
-    
+    document.getElementById('media').classList.remove('active')
+
     let searchInput = document.getElementById('search').value
     const url = `${SEARCH.baseUrl}search/person?api_key=${SEARCH.api}&query=${searchInput}`
     console.log(url)
@@ -121,8 +122,10 @@ const MEDIA = {
 
     SEARCH.actorProfile.forEach(actor => {
       if(id == actor.id) {
+        console.log(actor)
           console.log('FOUND EM')
           actor.known_for.forEach(title => {
+            if (title.media_type === "movie"){
           let df = new DocumentFragment
           let div = document.createElement('div')
           let name = document.createElement('h3')
@@ -134,9 +137,22 @@ const MEDIA = {
           poster.alt = `${title.original_title}`
           year.innerHTML = `Release date : ${title.release_date}`
           
-          if (title.original_title === undefined) {
-            console.log('movie not found')
-          } else {
+          div.append(poster,name,year)
+          df.append(div)
+          knownFor.append(df)
+        }
+            if (title.media_type === "tv"){
+          let df = new DocumentFragment
+          let div = document.createElement('div')
+          let name = document.createElement('h3')
+          let year = document.createElement('p')
+          let poster = document.createElement('img')
+            
+          name.innerHTML = title.original_name
+          poster.src = `${APP.imageUrl}w154${title.poster_path}`
+          poster.alt = `${title.original_title}`
+          year.innerHTML = `Release date : ${title.first_air_date}`
+          
           div.append(poster,name,year)
           df.append(div)
           knownFor.append(df)
