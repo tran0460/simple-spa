@@ -80,10 +80,23 @@ header form {
   background-color: white;
 }
 
+#sort {
+  font-size: 1.2rem;
+}
+#sort a {
+  color:black
+}
+#sort a:hover,
+#sort a:active {
+  color: hsl(20, 40%, 40%);
+}
+
 /*******************
   content area
 *******************/
-
+.hidden {
+  display: none;
+}
 #instructions {
   display: none;
   text-align: center;
@@ -117,6 +130,10 @@ header form {
 #actors-cards {
   display: none;
 }
+#actors-cards.active > div:hover {
+  box-shadow: 0 0 1rem rgb(0, 0, 0, 30%);
+  cursor: pointer;
+}
 .content p {
   padding: 0 1rem;
   margin: 1rem 0;
@@ -137,7 +154,7 @@ header form {
   left: 0;
   right: 0;
   z-index: 10000;
-  position: fixed;
+  position: absolute;
   background-color: hsl(20, 30%, 90%);
   margin-top: calc(15vh + 2.5rem);
   box-shadow:  -1rem 0.5rem 1rem rgba(0, 0, 0, 0.3);
@@ -228,7 +245,7 @@ header form {
   #actors h2,
   #media h2 {
     /* for the wider screens */
-    font-size: 10.5rem;
+    font-size: 7rem;
     color: hsla(20, 10%, 30%, 0.32);
     position: relative;
     writing-mode: vertical-lr;
@@ -248,7 +265,7 @@ header form {
     grid-column: 2/span 2;
   }
 }
-@media all and (min-width: 1200px) {
+@media all and (min-width: 1000px) {
   #actors .content div {
     width: 40%;
     display: grid;
@@ -269,6 +286,40 @@ header form {
     width: 42px;
   }
   #media.active {
-    margin-top: calc(15vh + 1rem);
+    margin-top: calc(15vh + 3rem);
   }
+}
+
+/* animation */
+#media.active,
+#actors-cards.active {
+  animation: slideIn 0.3s linear forwards;
+}
+@keyframes slideIn {
+  0% {
+    transform: translateX(30em)
+  }
+  100% {
+    transform: translateX(0)
+  }
+}
+/* loader */
+.loader.active {
+  border: 16px solid #f3f3f3; 
+  border-top: 15px solid hsl(20, 40%, 40%); 
+  border-radius: 500rem;
+  width: 6rem;
+  height: 6rem;
+  animation: spin 1s linear infinite;
+  margin:auto;
+  margin-top:30vh;
+}
+
+@keyframes spin {
+  0% { 
+    transform: rotate(0deg); 
+  }
+  100% {
+    transform: rotate(360deg); 
+    }
 }
