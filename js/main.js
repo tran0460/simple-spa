@@ -60,8 +60,6 @@ const SEARCH = {
     const url = `${SEARCH.baseUrl}search/person?api_key=${SEARCH.api}&query=${searchInput}`
     console.log(url)
     if (key in localStorage && getKey.length > 0) {
-      console.log(key)
-      console.log(data)
       if (SEARCH.actorProfile.length === 0) {
         data.forEach(profile => {
           SEARCH.actorProfile.push(profile)
@@ -158,7 +156,6 @@ const MEDIA = {
     SEARCH.actorProfile.forEach(actor => {
       if(id == actor.id) {
         MEDIA.actorName = actor.name
-        console.log(MEDIA.actorName)
         actor.known_for.forEach(title => {
           let df = new DocumentFragment
           let div = document.createElement('div')
@@ -171,13 +168,10 @@ const MEDIA = {
           poster.alt = `${title.original_title}`
           year.innerHTML = `Release date : ${title.release_date}`
           
-          if (title.original_title === undefined) {
-            console.log('movie not found')
-          } else {
             div.append(poster,name,year)
             df.append(div)
             knownFor.append(df)
-          }
+          
         })
       }
     })
@@ -189,7 +183,6 @@ const MEDIA = {
 const STORAGE = {
   data: () => {
     let input = document.getElementById('search').value
-    console.log(SEARCH.actorProfile)
     let actorData = JSON.stringify(SEARCH.actorProfile)
     localStorage.setItem(`${input}`, actorData)
   }
@@ -212,6 +205,12 @@ const NAV = {
     document.title = MEDIA.actorName
   },
   handlePop: () => {
+    const key = location.href.split('#')
+    let getKey = localStorage.getItem(key)
+    if (key in localStorage) {
+    let data = JSON.parse(getKey)
+    console.log(data)
+    }
     console.log('pop')
   }
 };
