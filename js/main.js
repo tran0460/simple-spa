@@ -25,6 +25,7 @@ const APP = {
     document.addEventListener('DOMContentLoaded', () => {
       NAV.homeUrl()
       document.getElementById('instructions').classList.add('active')
+      STORAGE.saveState()
     })
     document.addEventListener('DOMContentLoaded',APP.getConfig)
     document.getElementById('btnSearch').addEventListener('click', SEARCH.handleSearch)
@@ -136,6 +137,7 @@ const ACTORS = {
       div.append(avatar,ACTORS.name,pop)
       df.append(div)
       actorCards.append(df)
+      STORAGE.saveState()
     }
   })
   }
@@ -156,27 +158,46 @@ const MEDIA = {
     SEARCH.actorProfile.forEach(actor => {
       if(id == actor.id) {
         MEDIA.actorName = actor.name
-        actor.known_for.forEach(title => {
+        console.log(actor)
+          console.log('FOUND EM')
+          actor.known_for.forEach(title => {
+            if (title.media_type === "movie"){
           let df = new DocumentFragment
           let div = document.createElement('div')
           let name = document.createElement('h3')
           let year = document.createElement('p')
           let poster = document.createElement('img')
-          
+            
           name.innerHTML = title.original_title
           poster.src = `${APP.imageUrl}w154${title.poster_path}`
           poster.alt = `${title.original_title}`
           year.innerHTML = `Release date : ${title.release_date}`
           
-            div.append(poster,name,year)
-            df.append(div)
-            knownFor.append(df)
+          div.append(poster,name,year)
+          df.append(div)
+          knownFor.append(df)
+        }
+            if (title.media_type === "tv"){
+          let df = new DocumentFragment
+          let div = document.createElement('div')
+          let name = document.createElement('h3')
+          let year = document.createElement('p')
+          let poster = document.createElement('img')
+            
+          name.innerHTML = title.original_name
+          poster.src = `${APP.imageUrl}w154${title.poster_path}`
+          poster.alt = `${title.original_title}`
+          year.innerHTML = `Release date : ${title.first_air_date}`
           
-        })
-      }
-    })
+          div.append(poster,name,year)
+          df.append(div)
+          knownFor.append(df)
+        }
+      })
+    }
     NAV.changeUrlMedia(id)
-
+    STORAGE.saveState()
+    })
 }
 }
 
@@ -185,9 +206,13 @@ const STORAGE = {
     let input = document.getElementById('search').value
     let actorData = JSON.stringify(SEARCH.actorProfile)
     localStorage.setItem(`${input}`, actorData)
+  },
+  saveState: () => {
+    const key = location.href
+    let pageState = document.body.innerHTML
+    localStorage.setItem(`${key}`, JSON.stringify(pageState))
   }
 };
-
 
 const NAV = {
   hrefQuery: null,
@@ -204,15 +229,16 @@ const NAV = {
     history.replaceState('random', '', `#${hrefQuery}/${id}`)
     document.title = MEDIA.actorName
   },
-  handlePop: () => {
-    const key = location.href.split('#')
-    let getKey = localStorage.getItem(key)
-    if (key in localStorage) {
-    let data = JSON.parse(getKey)
-    console.log(data)
-    }
-    console.log('pop')
-  }
+  // handlePop: () => {
+  //   let key = location.href
+  //   let getKey = localStorage.getItem(key)
+  //   let data = JSON.parse(getKey)
+  //   if (key in localStorage) {
+  //     console.log(data)
+  //     document.body.innerHTML = data
+  //   }
+  //   APP.init()
+  // }
 };
 
 
