@@ -25,7 +25,6 @@ const APP = {
     document.addEventListener('DOMContentLoaded', () => {
       NAV.homeUrl()
       document.getElementById('instructions').classList.add('active')
-      // STORAGE.saveState()
     })
     document.addEventListener('DOMContentLoaded',APP.getConfig)
     document.getElementById('btnSearch').addEventListener('click', SEARCH.handleSearch)
@@ -52,7 +51,7 @@ const SEARCH = {
   handleSearch: (ev) => {
     ev.preventDefault();
     document.querySelector('.active').classList.remove('active')
-    document.getElementById('media').classList.remove('active')
+    document.querySelector('#media').classList.remove('active')
 
     let searchInput = document.getElementById('search').value
     let key = searchInput
@@ -107,13 +106,9 @@ const ACTORS = {
     document.getElementById('pop-sort').addEventListener('click', SORT.pop)
     NAV.changeUrlActor()
     STORAGE.data()
-
-    ACTORS.buildCard()
-  },
-  buildCard: () => {
-    
     const actorCards = document.getElementById('actors-cards')
     actorCards.innerHTML = ''
+    
     actorCards.classList.add('active')
     document.getElementById('actors').classList.add('active')    
     SEARCH.actorProfile.forEach(actor => {
@@ -145,7 +140,6 @@ const ACTORS = {
     }
   })
   }
-  
 };
 
 const MEDIA = {
@@ -201,7 +195,6 @@ const MEDIA = {
       })
     }
     NAV.changeUrlMedia(id)
-    // STORAGE.saveState()
     })
 }
 }
@@ -212,11 +205,6 @@ const STORAGE = {
     let actorData = JSON.stringify(SEARCH.actorProfile)
     localStorage.setItem(`${input}`, actorData)
   },
-  // saveState: () => {
-  //   const key = location.href
-  //   let pageState = document.body.innerHTML
-  //   localStorage.setItem(`${key}`, JSON.stringify(pageState))
-  // }
 };
 
 const NAV = {
@@ -227,14 +215,32 @@ const NAV = {
   changeUrlActor: () => {
     let input = document.getElementById('search').value
     location.hash = `${input}`
+    // history.pushState(input, '', `${input}`)
     hrefQuery = location.href.split('#')[1]
     document.title = hrefQuery[0].toUpperCase() + hrefQuery.slice([1])
+
+    // const state = { 'search_query': input}
+    // const title = ''
+    // const url = location.hash
+    // history.pushState(state, title, url)
   },
   changeUrlMedia: (id) => {
     location.hash = `${hrefQuery}/${id}`
+    // history.pushState(MEDIA.actorName, '', `${hrefQuery}/${id}`)
     document.title = MEDIA.actorName
+    // const state = { 'actor_name': hrefQuery, 'actor_id': id }
+    // const title = ''
+    // const url = location.hash
+    // history.pushState(state, title, url)
   },
   handlePop: () => {
+    const state = {}
+    const title = ''
+    const url = location.hash
+    history.replaceState(state, title, url)
+    // window.history.back()
+    // window.history.back()
+    // history.back(1)
     // let key = location.href
     // let getKey = localStorage.getItem(key)
     // let data = JSON.parse(getKey)
@@ -247,7 +253,8 @@ const NAV = {
 
 
 const SORT = {
-  name: () => {
+  name: (ev) => {
+    ev.preventDefault()
     document.getElementById('name-sort').removeEventListener('click', SORT.name)
     document.getElementById('name-sort').addEventListener('click', SORT.nameReverse)
     SEARCH.actorProfile.sort((a,b) => {
@@ -257,11 +264,45 @@ const SORT = {
         return -1
       }
     })
-    ACTORS.buildCard()
+    console.log(SEARCH.actorProfile)
+    const actorCards = document.getElementById('actors-cards')
+    actorCards.innerHTML = ''
+      SEARCH.actorProfile.forEach(actor => {
+        let df = new DocumentFragment;
+        let div = document.createElement('div')
+          div.addEventListener('click', MEDIA.display)
+          div.addEventListener('click', () => {
+            let heading = document.getElementById('actors-heading')
+            heading.classList.add('big-header')
+          })
+        div.setAttribute('data-actorId',`${actor.id}`)
+        ACTORS.name = document.createElement('h3')
+        let pop = document.createElement('p')
+        let avatar = document.createElement('img')
+        ACTORS.name.innerHTML = actor.name
+        avatar.src = `${APP.imageUrl}w154${actor.profile_path}`
+        avatar.alt = `${actor.name}`
+        pop.innerHTML = `Popularity: ${actor.popularity}`
+        if (actor.name === undefined) {
+          console.log(`actor not found`)
+        } else if (avatar.src === undefined) {
+          console.log('avatar not found')
+        }
+        else {
+          div.append(avatar,ACTORS.name,pop)
+          df.append(div)
+          actorCards.append(df)
+        }
+        console.log('append ')
+      })
+    
+    console.log('sorted')
   },
-  pop: () => {
+  pop: (ev) => {
+    ev.preventDefault()
     document.getElementById('pop-sort').removeEventListener('click', SORT.pop)
     document.getElementById('pop-sort').addEventListener('click', SORT.popReverse)
+
     SEARCH.actorProfile.sort((a,b) => {
       if(a.popularity > b.popularity) {
         return 1
@@ -269,9 +310,39 @@ const SORT = {
         return -1
       }
     })
-    ACTORS.buildCard()
+    console.log(SEARCH.actorProfile)
+    const actorCards = document.getElementById('actors-cards')
+    actorCards.innerHTML = ''
+      SEARCH.actorProfile.forEach(actor => {
+        let df = new DocumentFragment;
+        let div = document.createElement('div')
+          div.addEventListener('click', MEDIA.display)
+          div.addEventListener('click', () => {
+            let heading = document.getElementById('actors-heading')
+            heading.classList.add('big-header')
+          })
+        div.setAttribute('data-actorId',`${actor.id}`)
+        ACTORS.name = document.createElement('h3')
+        let pop = document.createElement('p')
+        let avatar = document.createElement('img')
+        ACTORS.name.innerHTML = actor.name
+        avatar.src = `${APP.imageUrl}w154${actor.profile_path}`
+        avatar.alt = `${actor.name}`
+        pop.innerHTML = `Popularity: ${actor.popularity}`
+        if (actor.name === undefined) {
+          console.log(`actor not found`)
+        } else if (avatar.src === undefined) {
+          console.log('avatar not found')
+        }
+        else {
+          div.append(avatar,ACTORS.name,pop)
+          df.append(div)
+          actorCards.append(df)
+        }
+      })  
   },
-  nameReverse : () => {
+  nameReverse : (ev) => {
+    ev.preventDefault()
     document.getElementById('name-sort').removeEventListener('click', SORT.nameReverse)
     document.getElementById('name-sort').addEventListener('click', SORT.name)
     SEARCH.actorProfile.sort((a,b) => {
@@ -281,9 +352,41 @@ const SORT = {
         return 1
       }
     })
-    ACTORS.buildCard()
+    console.log(SEARCH.actorProfile)
+    const actorCards = document.getElementById('actors-cards')
+    actorCards.innerHTML = ''
+      SEARCH.actorProfile.forEach(actor => {
+        let df = new DocumentFragment;
+        let div = document.createElement('div')
+          div.addEventListener('click', MEDIA.display)
+          div.addEventListener('click', () => {
+            let heading = document.getElementById('actors-heading')
+            heading.classList.add('big-header')
+          })
+        div.setAttribute('data-actorId',`${actor.id}`)
+        ACTORS.name = document.createElement('h3')
+        let pop = document.createElement('p')
+        let avatar = document.createElement('img')
+        ACTORS.name.innerHTML = actor.name
+        avatar.src = `${APP.imageUrl}w154${actor.profile_path}`
+        avatar.alt = `${actor.name}`
+        pop.innerHTML = `Popularity: ${actor.popularity}`
+        if (actor.name === undefined) {
+          console.log(`actor not found`)
+        } else if (avatar.src === undefined) {
+          console.log('avatar not found')
+        }
+        else {
+          div.append(avatar,ACTORS.name,pop)
+          df.append(div)
+          actorCards.append(df)
+        }
+        console.log('append ')
+      })
+    
   },
-  popReverse: () => {
+  popReverse: (ev) => {
+    ev.preventDefault()
     document.getElementById('pop-sort').removeEventListener('click', SORT.popReverse)
     document.getElementById('pop-sort').addEventListener('click', SORT.pop)
     SEARCH.actorProfile.sort((a,b) => {
@@ -293,7 +396,36 @@ const SORT = {
         return 1
       }
     })
-    ACTORS.buildCard()
+    console.log(SEARCH.actorProfile)
+    const actorCards = document.getElementById('actors-cards')
+    actorCards.innerHTML = ''
+      SEARCH.actorProfile.forEach(actor => {
+        let df = new DocumentFragment;
+        let div = document.createElement('div')
+          div.addEventListener('click', MEDIA.display)
+          div.addEventListener('click', () => {
+            let heading = document.getElementById('actors-heading')
+            heading.classList.add('big-header')
+          })
+        div.setAttribute('data-actorId',`${actor.id}`)
+        ACTORS.name = document.createElement('h3')
+        let pop = document.createElement('p')
+        let avatar = document.createElement('img')
+        ACTORS.name.innerHTML = actor.name
+        avatar.src = `${APP.imageUrl}w154${actor.profile_path}`
+        avatar.alt = `${actor.name}`
+        pop.innerHTML = `Popularity: ${actor.popularity}`
+        if (actor.name === undefined) {
+          console.log(`actor not found`)
+        } else if (avatar.src === undefined) {
+          console.log('avatar not found')
+        }
+        else {
+          div.append(avatar,ACTORS.name,pop)
+          df.append(div)
+          actorCards.append(df)
+        }
+      })  
   }
 }
 
