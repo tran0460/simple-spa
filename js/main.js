@@ -26,11 +26,11 @@ const APP = {
       NAV.homeUrl()
       document.getElementById('instructions').classList.add('active')
     })
+
     document.addEventListener('DOMContentLoaded',APP.getConfig)
 
     document.getElementById('btnSearch').addEventListener('click', SEARCH.getInput)
 
-    document.addEventListener('popstate', NAV.handlePop)
     document.getElementById('actors-heading').addEventListener('click', () => {
 
     document.getElementById('sort').classList.remove('hidden')
@@ -59,7 +59,6 @@ const SEARCH = {
     SEARCH.handleSearch(searchKey)
   },
   handleSearch: (searchKey) => {
-    // searchKey.preventDefault();
     document.querySelector('.active').classList.remove('active')
     document.querySelector('#media').classList.remove('active')
 
@@ -108,7 +107,6 @@ const SEARCH = {
       alert(`CAUGHT THIS ERROR : ${err.name}`)
   })
   }
-  // document.getElementById('search').value = ''
   }
 };
 
@@ -225,7 +223,33 @@ const NAV = {
               SEARCH.actorProfile.push(profile)
             })
           }
-        }
+        } else {
+          const url = `${SEARCH.baseUrl}search/person?api_key=${SEARCH.api}&query=${name}`
+          console.log(url)
+          document.querySelector('.loader').classList.add('active')
+        fetch(url) 
+        .then(response => {
+          if (response.ok) {
+            console.log('fetch successful')
+            return response.json()
+          } else {
+            alert(`OOPS something went wrong : ${response.status}`)
+          }
+        })
+        .then (data => {
+          SEARCH.actorProfile = []
+          data.results.forEach(profile => {
+            SEARCH.actorProfile.push(profile)
+          })
+          document.querySelector('.loader').classList.remove('active')
+          STORAGE.data()
+          ACTORS.display()
+        })
+        .catch(err => {
+          alert(`CAUGHT THIS ERROR : ${err.name}`)
+      })
+      }
+        
         // BUILD MEDIA CARD
         document.getElementById('media').classList.add('active')
         document.getElementById('actors-cards').classList.remove('active')
@@ -287,7 +311,32 @@ const NAV = {
           }
           document.getElementById('media').classList.remove('active')
           ACTORS.display()
-        }
+        } else {
+          const url = `${SEARCH.baseUrl}search/person?api_key=${SEARCH.api}&query=${query}`
+          console.log(url)
+          document.querySelector('.loader').classList.add('active')
+        fetch(url) 
+        .then(response => {
+          if (response.ok) {
+            console.log('fetch successful')
+            return response.json()
+          } else {
+            alert(`OOPS something went wrong : ${response.status}`)
+          }
+        })
+        .then (data => {
+          SEARCH.actorProfile = []
+          data.results.forEach(profile => {
+            SEARCH.actorProfile.push(profile)
+          })
+          document.querySelector('.loader').classList.remove('active')
+          STORAGE.data()
+          ACTORS.display()
+        })
+        .catch(err => {
+          alert(`CAUGHT THIS ERROR : ${err.name}`)
+      })
+      }
       }
     }
     // document.getElementById('search').value = ''
