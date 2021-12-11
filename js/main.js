@@ -27,7 +27,8 @@ const APP = {
       document.getElementById('instructions').classList.add('active')
     })
     document.addEventListener('DOMContentLoaded',APP.getConfig)
-    document.getElementById('btnSearch').addEventListener('click', SEARCH.handleSearch)
+
+    document.getElementById('btnSearch').addEventListener('click', SEARCH.getInput)
 
     document.addEventListener('popstate', NAV.handlePop)
     document.getElementById('actors-heading').addEventListener('click', () => {
@@ -47,19 +48,27 @@ const SEARCH = {
   baseUrl : 'https://api.themoviedb.org/3/',
   api: 'f8950444a4c0c67cbff1553083941ae3',
   actorProfile: [],
-  
-  handleSearch: (ev) => {
-    ev.preventDefault();
+  length: undefined,
+  getInput: (ev) => {
+    ev.preventDefault()
+    let input = document.getElementById('search').value
+    SEARCH.length = input.length
+    history.pushState({}, '', `#${input}`)
+    let searchKey = location.hash.replace('#', '')
+    console.log(searchKey)
+    SEARCH.handleSearch(searchKey)
+  },
+  handleSearch: (searchKey) => {
+    // searchKey.preventDefault();
     document.querySelector('.active').classList.remove('active')
     document.querySelector('#media').classList.remove('active')
 
-    let searchInput = document.getElementById('search').value
+    let searchInput = searchKey
+    console.log(searchKey)
     let key = searchInput
     let getKey = localStorage.getItem(key)
     let data = JSON.parse(getKey)
 
-    const url = `${SEARCH.baseUrl}search/person?api_key=${SEARCH.api}&query=${searchInput}`
-    console.log(url)
     if (key in localStorage && getKey.length > 0) {
       if (SEARCH.actorProfile.length === 0) {
         data.forEach(profile => {
@@ -74,6 +83,8 @@ const SEARCH = {
       }
       ACTORS.display()
     } else {
+      const url = `${SEARCH.baseUrl}search/person?api_key=${SEARCH.api}&query=${searchInput}`
+      console.log(url)
       document.querySelector('.loader').classList.add('active')
     fetch(url) 
     .then(response => {
@@ -97,17 +108,17 @@ const SEARCH = {
       alert(`CAUGHT THIS ERROR : ${err.name}`)
   })
   }
-  document.getElementById('search').value = ''
+  // document.getElementById('search').value = ''
   }
 };
 
 const ACTORS = {
-  fullName: undefined,
+  firstName: undefined,
   display: () => {
     document.getElementById('name-sort').addEventListener('click', SORT.name)
     document.getElementById('pop-sort').addEventListener('click', SORT.pop)
-    NAV.changeUrlActor()
     ACTORS.buildCard()
+    NAV.changeUrlActor()
   },
   buildCard: () => {
   const actorCards = document.getElementById('actors-cards')
@@ -128,7 +139,9 @@ const ACTORS = {
   let pop = document.createElement('p')
   let avatar = document.createElement('img')
 
-  ACTORS.fullName = actor.name
+  let index = actor.name.indexOf(' ')
+  ACTORS.firstName = actor.name.slice(0, index)
+
   ACTORS.name.innerHTML = actor.name
   avatar.src = `${APP.imageUrl}w154${actor.profile_path}`
   avatar.alt = `${actor.name}`
@@ -153,12 +166,9 @@ const MEDIA = {
     document.getElementById('media').classList.add('active')
     document.getElementById('actors-cards').classList.remove('active')
     document.getElementById('sort').classList.add('hidden')
-
-    
     let id = ev.currentTarget.getAttribute('data-actorId')
-
     NAV.changeUrlMedia(id)
-}
+  }
 }
 
 const STORAGE = {
@@ -168,51 +178,28 @@ const STORAGE = {
     localStorage.setItem(`${input}`, actorData)
   },
 };
-
 const NAV = {
-  // hrefQuery: null,
   homeUrl: () => {
-    location.hash = `#`
+    history.replaceState({},'','#')
   },
   changeUrlActor: () => {
-    let input = document.getElementById('search').value
-    // let name = ACTORS.fullName
-    // let lowerName = name.toLowerCase()
-    
-    // history.pushState({}, '', `#${input}`)
-    
-    
-    // const state = { 'search_query': input}
-    // const title = ''
-    // const url = location.hash
-    // history.pushState(state, title, url)
-    
-    location.hash = `${input}`
+    let nameLowerCase = ACTORS.firstName.toLowerCase()
+    location.hash = `${nameLowerCase}`
+
     hrefQuery = location.href.split('#')[1]
     document.title = hrefQuery[0].toUpperCase() + hrefQuery.slice([1])
   },
   changeUrlMedia: (id) => {
-    // hrefQuery = location.href.split('#')[1]
-    
-    // location.hash = ``
-    // history.pushState({}, '', `${hrefQuery}/${id}`)
-    
-    // const state = { 'actor_name': hrefQuery, 'actor_id': id }
-    // const title = ''
-    // const url = location.hash
-    // history.pushState(state, title, url)
-    
     location.hash = `${hrefQuery}/${id}`
     document.title = MEDIA.actorName
   },
   handlePop: () => {
-
     const url = location.href
     const query = url.split('#')[1]
     let name
     let id
-
     if (query === '' ){
+      document.title = 'Simple Movie SPA'
       document.getElementById('media').classList.remove('active')
       document.getElementById('actors').classList.remove('active')    
       document.getElementById('instructions').classList.add('active')
@@ -222,10 +209,10 @@ const NAV = {
       if (query.includes('/') === true) {
         name = query.split('/')[0]
         id = query.split('/')[1]
+        location.hash = `${name}/${id}`
         let key = name
         let getKey = localStorage.getItem(key)
         let data = JSON.parse(getKey)
-    
         if (key in localStorage && getKey.length > 0) {
           if (SEARCH.actorProfile.length === 0) {
             data.forEach(profile => {
@@ -245,7 +232,6 @@ const NAV = {
         document.getElementById('sort').classList.add('hidden')
       let knownFor = document.getElementById('known-for')
       knownFor.innerHTML = ''
-      
       SEARCH.actorProfile.forEach(actor => {
         if(id == actor.id) {
           MEDIA.actorName = actor.name
@@ -256,12 +242,10 @@ const NAV = {
             let name = document.createElement('h3')
             let year = document.createElement('p')
             let poster = document.createElement('img')
-              
             name.innerHTML = title.original_title
             poster.src = `${APP.imageUrl}w154${title.poster_path}`
             poster.alt = `${title.original_title}`
             year.innerHTML = `Release date : ${title.release_date}`
-            
             div.append(poster,name,year)
             df.append(div)
             knownFor.append(df)
@@ -272,12 +256,10 @@ const NAV = {
             let name = document.createElement('h3')
             let year = document.createElement('p')
             let poster = document.createElement('img')
-              
             name.innerHTML = title.original_name
             poster.src = `${APP.imageUrl}w154${title.poster_path}`
             poster.alt = `${title.original_title}`
             year.innerHTML = `Release date : ${title.first_air_date}`
-            
             div.append(poster,name,year)
             df.append(div)
             knownFor.append(df)
@@ -291,7 +273,6 @@ const NAV = {
         let key = query
         let getKey = localStorage.getItem(key)
         let data = JSON.parse(getKey)
-    
         if (key in localStorage && getKey.length > 0) {
           if (SEARCH.actorProfile.length === 0) {
             data.forEach(profile => {
@@ -309,6 +290,7 @@ const NAV = {
         }
       }
     }
+    // document.getElementById('search').value = ''
   }
 };
 
@@ -326,7 +308,6 @@ const SORT = {
       }
     })
     ACTORS.buildCard()
-
   },
   pop: (ev) => {
     ev.preventDefault()
@@ -341,7 +322,6 @@ const SORT = {
       }
     })
     ACTORS.buildCard()
-
   },
   nameReverse : (ev) => {
     ev.preventDefault()
@@ -355,7 +335,6 @@ const SORT = {
       }
     })
     ACTORS.buildCard()
-
     
   },
   popReverse: (ev) => {
@@ -370,7 +349,6 @@ const SORT = {
       }
     })
     ACTORS.buildCard()
-
   }
 }
 
