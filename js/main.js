@@ -171,7 +171,7 @@ const MEDIA = {
 
 const STORAGE = {
   data: () => {
-    let input = document.getElementById('search').value
+    let input = location.hash.replace('#', '')
     let actorData = JSON.stringify(SEARCH.actorProfile)
     localStorage.setItem(`${input}`, actorData)
   },
@@ -339,7 +339,6 @@ const NAV = {
       }
       }
     }
-    // document.getElementById('search').value = ''
   }
 };
 
