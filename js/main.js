@@ -183,7 +183,6 @@ const NAV = {
   changeUrlActor: () => {
     let nameLowerCase = ACTORS.firstName.toLowerCase()
     location.hash = `${nameLowerCase}`
-
     hrefQuery = location.href.split('#')[1]
     document.title = hrefQuery[0].toUpperCase() + hrefQuery.slice([1])
   },
