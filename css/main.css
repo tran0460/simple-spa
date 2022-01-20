@@ -24,7 +24,7 @@ body {
 *******************/
 
 header {
-  background-color: hsl(20, 40%, 40%);
+  background-color: #195382;
   color: hsl(20, 40%, 100%);
   display: flex;
   flex-direction: column;
@@ -32,7 +32,7 @@ header {
   align-items: center;
   min-height: 15vh;
   font-size: 1rem;
-  border-bottom: 0.5rem solid hsl(20, 10%, 30%);
+  border-bottom: 0.5rem solid #0c273d;
 }
 header h1,
 header form {
@@ -156,7 +156,7 @@ header form {
   z-index: 10000;
   position: absolute;
   background-color: hsl(20, 30%, 90%);
-  margin-top: calc(15vh + 2.5rem);
+  margin-top: 9.5rem;
   box-shadow:  -1rem 0.5rem 1rem rgba(0, 0, 0, 0.3);
   margin-left: 5rem;
 }
@@ -170,6 +170,7 @@ header form {
   flex-direction: row;
   justify-content: center;
   flex-wrap: wrap;
+  flex-grow: 1;
 }
 #actors .content div {
   max-width: 22rem;
@@ -228,6 +229,7 @@ header form {
     z-index: 10000;
     margin-left: 20vw;
     min-height: 100vh;
+    margin-top:7rem;
   }
 
   #search {
@@ -276,7 +278,7 @@ header form {
     margin: 1rem;
   }
   header {
-    font-size: 2rem;
+    font-size: 1.6rem;
   }
   #search {
     font-size: 1.5rem;
@@ -286,7 +288,7 @@ header form {
     width: 42px;
   }
   #media.active {
-    margin-top: calc(15vh + 3rem);
+    margin-top: 7.5rem;
   }
 }
 
@@ -306,7 +308,7 @@ header form {
 /* loader */
 .loader.active {
   border: 16px solid #f3f3f3; 
-  border-top: 15px solid hsl(20, 40%, 40%); 
+  border-top: 15px solid #0c273d; 
   border-radius: 500rem;
   width: 6rem;
   height: 6rem;
